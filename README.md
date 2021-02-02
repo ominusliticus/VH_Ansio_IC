@@ -5,4 +5,4 @@ Please see (in progress) for derivations and descriptions of the here-in contain
 
 The jupyter notebook `Anisotropic_first_order_numerics.ipynb` does the numerical evolution of the hydrodynamic equations, and outputs the energy density as a function of time (still deciding how I want to do this).
 
-The notebook requires the files `hydro_simulation.py` and `hydro_model.py` to run. The code was packaged into these modules to the Jupyter notebook itself more readable.
+The notebook requires the files `hydro_simulation.py` and `hydro_model.py` to run. The code was packaged into these modules so the Jupyter notebook itself is more readable.
