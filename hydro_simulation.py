@@ -1,27 +1,30 @@
 import numpy as np
+import sys
 
 # global constant
 hbarc = 0.197326938 
 
 # structs/classes to store simulation variables
 class hydro_parameters:
-	def __init__(self,
-				tau_initial,
-				energy_initial,
-				shear_initial,
-				freezeout_temperature_GeV,
-				energy_min,
-				flux_limiter,
-				regulation_scheme,
-				dynamical_variables,
-				temperature_etas,
-				eta_bar,
-				constant_etas,
-				etas_min,
-				etas_aL,
-				etas_aH,
-				etas_etask,
-				etas_Tk_GeV):
+	def __init__(
+			self,
+			tau_initial,
+			energy_initial,
+			shear_initial,
+			freezeout_temperature_GeV,
+			energy_min,
+			flux_limiter,
+			regulation_scheme,
+			dynamical_variables,
+			temperature_etas,
+			eta_bar,
+			constant_etas,
+			etas_min,
+			etas_aL,
+			etas_aH,
+			etas_etask,
+			etas_Tk_GeV
+		):
 		self.tau_initial               = tau_initial
 		self.energy_initial            = energy_initial
 		self.shear_initial             = shear_initial
@@ -41,18 +44,20 @@ class hydro_parameters:
 
 # ---------------------------------------------------------------------
 class lattice_parameters:
-	def __init__(self,
-				lattice_points_x,
-				lattice_points_y,
-				lattice_points_eta,
-				lattice_spacing_x,
-				lattice_spacing_y,
-				lattice_spacing_eta,
-				adaptive_time_step,
-				delta_0,
-				alpha,
-				fixed_time_step,
-				max_time_steps):
+	def __init__(
+			self,
+			lattice_points_x,
+			lattice_points_y,
+			lattice_points_eta,
+			lattice_spacing_x,
+			lattice_spacing_y,
+			lattice_spacing_eta,
+			adaptive_time_step,
+			delta_0,
+			alpha,
+			fixed_time_step,
+			max_time_steps,
+		):
 		self.lattice_points_x    = lattice_points_x
 		self.lattice_points_y    = lattice_points_y
 		self.lattice_points_eta  = lattice_points_eta
@@ -863,7 +868,7 @@ class Hydro_Sim:
 			for j in range(2, Ny + 2):
 				for i in range(2, Nx + 2):
 					# linear array index
-					s = self.calc_linear_array_index(i, j, k, nx + 4, ny + 4)
+					s = self.calc_linear_array_index(i, j, k, Nx + 4, Ny + 4)
 
 					# upadte qI variabels
 					self.qI.Ttt[s]  = self.q.Ttt[s] + self.qI.Ttt[s] * dt; i += 1
@@ -1192,13 +1197,13 @@ class Hydro_Sim:
 				<Might want to check how adding same united objects affects this>
 				'''
 				if flag is 1: # compute for q
-					norm2  = self.q.Ttt[s] ** 2 + self.q.Ttx[s] ** 2 + self.q.Tty ** 2 + self.q.Ttn[s]
+					norm2  = self.q.Ttt[s] ** 2 + self.q.Ttx[s] ** 2 + self.q.Tty[s] ** 2 + self.q.Ttn[s]
 					norm2 += self.q.pitt[s] ** 2 + self.q.pitx[s] ** 2 + self.q.pity[s] ** 2 + self.q.pitn[s] ** 2
 					norm2 += self.q.pixx[s] ** 2 + self.q.pixy[s] ** 2 + self.q.piyy[s] ** 2
 					norm2 += self.q.pixn[s] ** 2 + self.q.piyn[s] ** 2
 					norm2 += self.q.pinn[s]
 				elif flag is 2: # compute for Q
-					norm2  = self.Q.Ttt[s] ** 2 + self.Q.Ttx[s] ** 2 + self.Q.Tty ** 2 + self.Q.Ttn[s]
+					norm2  = self.Q.Ttt[s] ** 2 + self.Q.Ttx[s] ** 2 + self.Q.Tty[s] ** 2 + self.Q.Ttn[s]
 					norm2 += self.Q.pitt[s] ** 2 + self.Q.pitx[s] ** 2 + self.Q.pity[s] ** 2 + self.Q.pitn[s] ** 2
 					norm2 += self.Q.pixx[s] ** 2 + self.Q.pixy[s] ** 2 + self.Q.piyy[s] ** 2
 					norm2 += self.Q.pixn[s] ** 2 + self.Q.piyn[s] ** 2
@@ -1254,9 +1259,9 @@ class Hydro_Sim:
 				c = f_norm2 * dt_abs4
 				b = 2 * q_dot_f * dt_abs4
 				a = q_norm2 * dt_abs4
-				roots = np.roots([1, 0, -c, -b, -a])
+				roots = np.roots(np.array([1, 0, -c, -b, -a]))
 				if np.max(roots) > 0 and not np.iscomplex(np.max(roots)):
-					return np.max(roots)
+					return np.real(np.max(roots))
 				else:
 					return dt_abs
 			# begin function implementation - compute_dt_source
@@ -1267,8 +1272,8 @@ class Hydro_Sim:
 			Ny   = self.m_lattice.lattice_points_y
 			Neta = self.m_lattice.lattice_points_eta
 			
-			alpha   = self.m_hydro.alpha
-			delta_0 = self.m_hydro.delta_0
+			alpha   = self.m_lattice.alpha
+			delta_0 = self.m_lattice.delta_0
 			for k in range(2, Neta + 2):
 				for j in range(2, Ny + 2):
 					for i in range(2, Nx + 2):
@@ -1279,7 +1284,7 @@ class Hydro_Sim:
 						q_star  = compute_q_star(s, dt_prev)
 						q_norm2 = compute_hydro_norm2(s, tau, 1)
 						f_norm2 = compute_hydro_norm2(s, tau, 2)
-						q_dot_f = dot_product(s, tau)
+						q_dot_f = compute_dot_product(s, tau)
 						
 						second_deriv_norm = compute_second_derivative_norm(s, q_star)
 						dt_source = np.fmin(dt_source, adaptive_method_norm(q_norm2, f_norm2, second_deriv_norm, q_dot_f,  dt_prev, delta_0))
@@ -1345,7 +1350,8 @@ class Hydro_Sim:
 		# simulation loop
 		hit_CFL_bound = False
 		for n in range(self.m_lattice.max_time_steps):
-			print(f'Time step: {n}')
+			if n % 100:
+				print(f'Time step: {n}')
 			if not self.check_all_cells_below_freezeout():
 				# set time step and check CFL condition
 				dt, hit_CFL_bound = self.set_time_step(n, tau, dtau_p, hit_CFL_bound, model)
