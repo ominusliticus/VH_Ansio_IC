@@ -245,7 +245,7 @@ class Hydro_Model:
                 l4 = dpi_dtau(tau[i-1] + dtau, veps_cur + k3 * dtau, pi_cur + l3 * dtau)
                 
                 veps_next = veps_cur + (k1 + 2*k2 + 2*k3 + k4) * dtau / 6 
-                v_next = pi_cur + (l1 + 2*l2 + 2*l3 + l4) * dtau / 6
+                pi_next = pi_cur + (l1 + 2*l2 + 2*l3 + l4) * dtau / 6
                 
                 veps_cur = veps_next
                 pi_cur   = pi_next
