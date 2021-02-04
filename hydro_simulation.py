@@ -1364,3 +1364,12 @@ class Hydro_Sim:
 			else:
 				break
 		print('Simulation has completed.\n')
+		
+	# def output_energy_density(n):
+		# '''
+		# This function output the energy density in the format
+		# x	e(y=n=0)	y	e(x=n=0)	n	e(x=y=0)
+		# where the last three columns are the value of the energy denisty at a
+		# '''
+		# fout = open(f'e_output_{n}.dat', 'r')
+		# for i
