@@ -1065,7 +1065,7 @@ class Hydro_Sim:
 		self.set_ghost_cells()
 
 		# second intermediate step
-		RK = 1
+		RK2 = 1
 		self.calculate_euler_step(tau, dtau, dtau_prev, update, RK2, model)
 		set_inferred_variables(tau)
 		regulate_viscous_currents(tau)
